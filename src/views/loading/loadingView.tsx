@@ -1,6 +1,6 @@
-import { containerStyles } from "../styles/styles";
 import { View, Text } from "react-native";
 import FAIcons from "@expo/vector-icons/FontAwesome";
+import { containerStyles } from "../../styles/containerStyles";
 
 function LoadingView() {
 	return (

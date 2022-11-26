@@ -1,12 +1,18 @@
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { useAppDispatch, useAppSelector } from "./hooks";
 import { initialize } from "./store/minifluxSlice";
 
+import { NavigationContainer } from "@react-navigation/native";
+
 import { PropsWithChildren, useEffect } from "react";
 
-import { containerStyles } from "./styles/styles";
-import LoginView from "./components/loginView";
-import LoadingView from "./components/loadingView";
+import LoginView from "./views/login/loginView";
+import LoadingView from "./views/loading/loadingView";
+import { containerStyles } from "./styles/containerStyles";
+import Navigator from "./views/navigator";
+
+import Navbar from "./views/navbar/navbar";
+import { Container } from "./components/containter";
 
 function Root() {
 	const initialized = useAppSelector((state) => state.miniflux.initialized);
@@ -33,15 +39,7 @@ function Root() {
 		);
 	}
 
-	return (
-		<Container>
-			<Text>Logged in: {loggedIn ? "yes" : "no"}</Text>
-		</Container>
-	);
-}
-
-function Container(props: PropsWithChildren) {
-	return <View style={containerStyles.mainContainer}>{props.children}</View>;
+	return <Navigator />;
 }
 
 export default Root;

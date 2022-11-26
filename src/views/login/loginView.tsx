@@ -1,10 +1,10 @@
 import { View, Text, TextInput } from "react-native";
 
-import { loginStyles } from "../styles/styles";
 import { useState } from "react";
-import Button from "./buttons";
-import { useAppDispatch, useAppSelector } from "../hooks";
-import { tryLogin } from "../store/minifluxSlice";
+import Button from "../../components/buttons";
+import { useAppDispatch, useAppSelector } from "../../hooks";
+import { tryLogin } from "../../store/minifluxSlice";
+import { loginStyles } from "../../styles/loginStyles";
 
 function LoginView() {
 	const [url, setUrl] = useState("");
