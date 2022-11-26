@@ -1,20 +1,25 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import Root from "./src/root";
+import { Entry, Feed } from "./src/api/interfaces";
+import { useState } from "react";
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+import { CurrentFeedContext, CurrentEntryContext } from "./src/currentContexts";
+
+function App() {
+	const [currentFeed, setCurrentFeed] = useState<Feed | undefined>(undefined);
+	const [currentEntry, setCurrentEntry] = useState<Entry | undefined>(
+		undefined,
+	);
+
+	return (
+		<CurrentEntryContext.Provider value={{ currentEntry, setCurrentEntry }}>
+			<CurrentFeedContext.Provider
+				value={{ currentFeed, setCurrentFeed }}
+			>
+				<Root></Root>
+			</CurrentFeedContext.Provider>
+		</CurrentEntryContext.Provider>
+	);
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
+export { CurrentFeedContext, CurrentEntryContext };

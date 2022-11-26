@@ -24,7 +24,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.bruhtek.OnyxMiniflux"
     },
     "web": {
       "favicon": "./assets/favicon.png"
