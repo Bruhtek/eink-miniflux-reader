@@ -1,25 +1,14 @@
-import Root from "./src/root";
-import { Entry, Feed } from "./src/api/interfaces";
-import { useState } from "react";
+import Root from "./src/index";
 
-import { CurrentFeedContext, CurrentEntryContext } from "./src/currentContexts";
+import { Provider } from "react-redux";
+import store from "./src/store/store";
 
 function App() {
-	const [currentFeed, setCurrentFeed] = useState<Feed | undefined>(undefined);
-	const [currentEntry, setCurrentEntry] = useState<Entry | undefined>(
-		undefined,
-	);
-
 	return (
-		<CurrentEntryContext.Provider value={{ currentEntry, setCurrentEntry }}>
-			<CurrentFeedContext.Provider
-				value={{ currentFeed, setCurrentFeed }}
-			>
-				<Root></Root>
-			</CurrentFeedContext.Provider>
-		</CurrentEntryContext.Provider>
+		<Provider store={store}>
+			<Root></Root>
+		</Provider>
 	);
 }
 
 export default App;
-export { CurrentFeedContext, CurrentEntryContext };

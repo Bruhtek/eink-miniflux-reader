@@ -5,7 +5,7 @@ import FAIcons from "@expo/vector-icons/FontAwesome";
 import api from "../../api/miniflux";
 import { ApiError, Feed } from "../../api/interfaces";
 import { useEffect, useState } from "react";
-import FeedView from "../feedList/feedView";
+import FeedView from "./feedView";
 
 function Index() {
 	const [feeds, setFeeds] = useState<Feed[]>([]);

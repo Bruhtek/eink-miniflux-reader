@@ -7,13 +7,16 @@ import LoginScreen from "./login/login";
 
 import api from "./api/miniflux";
 
-import Home from "./home/index";
-import Feeds from "./feeds/feedList/index";
-import Settings from "./settings/index";
+import Home from "./home";
+import Feeds from "./feeds/feedList";
+import Settings from "./settings";
 import { CurrentEntryContext, CurrentFeedContext } from "./currentContexts";
 
 import ArticlesList from "./feeds/articlesList";
 import ReaderView from "./feeds/readerView/reader";
+
+import { useSelector } from "react-redux";
+import { tryLogin } from "../store/minifluxSlice";
 
 function Root() {
 	const [currentTab, setCurrentTab] = useState(0);
