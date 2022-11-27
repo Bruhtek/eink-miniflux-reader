@@ -4,6 +4,7 @@ import {
 	Text,
 	Pressable,
 	TextProps,
+	ViewProps,
 } from "react-native";
 
 import { buttonStyles } from "../styles/styles";
@@ -34,8 +35,8 @@ function Button(props: ButtonProps) {
 }
 
 type ButtonProps = {
-	pressableStyle?: StyleProp<PressableProps>;
-	textStyle?: StyleProp<TextProps>;
+	pressableStyle?: StyleProp<any>;
+	textStyle?: StyleProp<any>;
 	text: string;
 
 	onPress: () => void;

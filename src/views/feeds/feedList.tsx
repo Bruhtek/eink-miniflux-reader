@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
 import FeedItem from "./feedItem";
 import { listStyles } from "../../styles/listStyles";
 import { useAppSelector } from "../../hooks";
@@ -8,14 +8,18 @@ function FeedList() {
 
 	return (
 		<View style={listStyles.listContainer}>
-			{Object.values(feeds).map((feed, index) => (
-				<FeedItem
-					title={feed.title}
-					subtitle={feed.site_url}
-					feedId={feed.id}
-					key={index}
-				/>
-			))}
+			<FlatList
+				data={Object.values(feeds)}
+				showsVerticalScrollIndicator={false}
+				renderItem={({ item }) => (
+					<FeedItem
+						title={item.title}
+						subtitle={item.site_url}
+						feedId={item.id}
+						key={item.id}
+					/>
+				)}
+			/>
 		</View>
 	);
 }

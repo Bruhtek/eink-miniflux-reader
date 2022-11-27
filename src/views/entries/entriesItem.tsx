@@ -5,7 +5,13 @@ function EntryItem(props: ListItemProps) {
 	return (
 		<View style={listStyles.listItem}>
 			<View style={listStyles.listItemTextContainer}>
-				<Text numberOfLines={1} style={listStyles.listItemTitle}>
+				<Text
+					numberOfLines={1}
+					style={[
+						listStyles.listItemTitle,
+						props.status === "unread" ? listStyles.boldText : null,
+					]}
+				>
 					{props.title}
 				</Text>
 				{props.subtitle ? (
@@ -21,6 +27,7 @@ function EntryItem(props: ListItemProps) {
 type ListItemProps = {
 	title: string;
 	subtitle?: string;
+	status: "read" | "unread" | "removed";
 };
 
 export default EntryItem;

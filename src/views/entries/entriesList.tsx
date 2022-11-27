@@ -1,43 +1,56 @@
-import { View, Text } from "react-native";
-import { listStyles } from "../../styles/listStyles";
+import { FlatList } from "react-native";
 import { useAppSelector } from "../../hooks";
 import EntryItem from "./entriesItem";
 import { Entry } from "../../store/minifluxSlice";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../navigator";
 
-type Props = NativeStackScreenProps<RootStackParamList, "Entries">;
-
-function EntriesList({ route, navigation }: Props) {
+function EntriesList(props: EntriesListProps) {
 	let entries = useAppSelector((state) => state.miniflux.entries);
 
-	console.log(entries.length);
-
-	if (route.params.filter.feedId) {
+	if (props.filter.feedId) {
 		entries = entries.filter(
-			(entry) => entry.feed_id === route.params.filter.feedId,
+			(entry) => entry.feed_id === props.filter.feedId,
 		);
 	}
-	if (route.params.filter.status) {
+	if (props.filter.status) {
 		entries = entries.filter(
-			(entry) => entry.status === route.params.filter.status,
+			(entry) => entry.status === props.filter.status,
 		);
 	}
 
 	const subtitle = (entry: Entry) => entry.content.replace(/<[^>]*>/g, "");
 
+	let values = Object.values(entries);
+	values = values.sort((a, b) => {
+		const dateA = Date.parse(a.published_at);
+		const dateB = Date.parse(b.published_at);
+		if (props.sortAsc) {
+			return dateA - dateB;
+		}
+		return dateB - dateA;
+	});
+
 	return (
-		<View style={listStyles.listContainer}>
-			<Text>{route.params.filter.feedId}</Text>
-			{entries.map((entry) => (
+		<FlatList
+			data={values}
+			showsVerticalScrollIndicator={false}
+			renderItem={({ item }) => (
 				<EntryItem
-					title={entry.title}
-					subtitle={subtitle(entry)}
-					key={entry.id}
+					title={item.title}
+					subtitle={subtitle(item)}
+					status={item.status}
+					key={item.id}
 				/>
-			))}
-		</View>
+			)}
+		/>
 	);
 }
+
+type EntriesListProps = {
+	filter: {
+		feedId?: string;
+		status?: "read" | "unread" | "removed";
+	};
+	sortAsc?: boolean;
+};
 
 export default EntriesList;

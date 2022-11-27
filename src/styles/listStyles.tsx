@@ -15,6 +15,9 @@ export const listStyles = StyleSheet.create({
 		justifyContent: "flex-start",
 		alignItems: "center",
 	},
+	listItemPressed: {
+		backgroundColor: "#ccc",
+	},
 	listItemTextContainer: {
 		marginLeft: 10,
 		flex: 1,
@@ -34,6 +37,9 @@ export const listStyles = StyleSheet.create({
 		height: "100%",
 	},
 	listItemTitle: {},
+	boldText: {
+		fontWeight: "900",
+	},
 	listItemSubtitle: {
 		color: "#888",
 	},

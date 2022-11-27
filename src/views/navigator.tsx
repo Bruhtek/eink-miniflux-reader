@@ -3,12 +3,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Home from "./home/home";
 import Feeds from "./feeds/feeds";
 import Settings from "./settings/settings";
-import {
-	CompositeScreenProps,
-	NavigationContainer,
-} from "@react-navigation/native";
-import EntriesList from "./entries/entriesList";
-import { StackScreenProps } from "@react-navigation/stack";
+import { NavigationContainer } from "@react-navigation/native";
+import EntriesView from "./entries/entriesView";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -22,7 +18,7 @@ function Navigator() {
 				<Stack.Screen name="Home" component={Home} />
 				<Stack.Screen name="Feeds" component={Feeds} />
 				<Stack.Screen name="Settings" component={Settings} />
-				<Stack.Screen name="Entries" component={EntriesList} />
+				<Stack.Screen name="Entries" component={EntriesView} />
 			</Stack.Navigator>
 		</NavigationContainer>
 	);
@@ -33,6 +29,7 @@ export type RootStackParamList = {
 	Feeds: undefined;
 	Settings: undefined;
 	Entries: {
+		title: string;
 		filter: {
 			feedId?: string;
 			status?: "unread" | "read" | "removed";

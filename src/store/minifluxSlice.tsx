@@ -269,7 +269,7 @@ export const tryGetFeedEntries = (feedId: string) => {
 			const state = getState();
 
 			const requestParams = new URLSearchParams({
-				limit: "5",
+				limit: "100",
 				order: "published_at",
 				direction: "desc",
 			});

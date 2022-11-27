@@ -23,26 +23,36 @@ function FeedItem(props: ListItemProps) {
 		<Pressable
 			onPress={() =>
 				navigation.push("Entries", {
+					title: props.title,
 					filter: { feedId: props.feedId },
 				})
 			}
 		>
-			<View style={listStyles.listItem}>
-				<View style={listStyles.listItemIconContainer}>
-					<Image
-						source={{ uri: icon }}
-						style={listStyles.listItemIcon}
-					/>
-				</View>
-				<View style={listStyles.listItemTextContainer}>
-					<Text style={listStyles.listItemTitle}>{props.title}</Text>
-					{props.subtitle ? (
-						<Text style={listStyles.listItemSubtitle}>
-							{props.subtitle}
+			{({ pressed }) => (
+				<View
+					style={[
+						listStyles.listItem,
+						pressed ? listStyles.listItemPressed : null,
+					]}
+				>
+					<View style={listStyles.listItemIconContainer}>
+						<Image
+							source={{ uri: icon }}
+							style={listStyles.listItemIcon}
+						/>
+					</View>
+					<View style={listStyles.listItemTextContainer}>
+						<Text style={listStyles.listItemTitle}>
+							{props.title}
 						</Text>
-					) : null}
+						{props.subtitle ? (
+							<Text style={listStyles.listItemSubtitle}>
+								{props.subtitle}
+							</Text>
+						) : null}
+					</View>
 				</View>
-			</View>
+			)}
 		</Pressable>
 	);
 }
