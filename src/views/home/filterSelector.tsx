@@ -17,6 +17,7 @@ function FilterSelector(props: FilterSelectorProps) {
 						backgroundColor: "black",
 						marginRight: 10,
 					}}
+					key={filter}
 				></Button>,
 			);
 			continue;

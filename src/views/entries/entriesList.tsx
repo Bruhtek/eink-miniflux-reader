@@ -38,6 +38,7 @@ function EntriesList(props: EntriesListProps) {
 					title={item.title}
 					subtitle={subtitle(item)}
 					status={item.status}
+					entry={item}
 					key={item.id}
 				/>
 			)}

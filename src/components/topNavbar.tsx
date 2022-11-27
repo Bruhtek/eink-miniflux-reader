@@ -25,7 +25,9 @@ function TopNavbar(props: TopNavbarProps) {
 	return (
 		<View style={topNavbarStyles.container}>
 			{beforeTitle}
-			<Text style={topNavbarStyles.titleText}>{props.title}</Text>
+			<Text numberOfLines={2} style={topNavbarStyles.titleText}>
+				{props.title}
+			</Text>
 			{rightItems}
 		</View>
 	);

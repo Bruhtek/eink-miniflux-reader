@@ -1,16 +1,15 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigator";
-import EntriesList from "./entriesList";
+import { containerStyles } from "../../styles/containerStyles";
+import TopNavbar from "../../components/topNavbar";
 import { Container } from "../../components/containter";
 import { View } from "react-native";
-import TopNavbar from "../../components/topNavbar";
-
-import { containerStyles } from "../../styles/containerStyles";
 import FAIcons from "@expo/vector-icons/FontAwesome";
+import ArticleContent from "./articleContent";
 
-type Props = NativeStackScreenProps<RootStackParamList, "Entries">;
+type Props = NativeStackScreenProps<RootStackParamList, "Article">;
 
-function EntriesView({ route, navigation }: Props) {
+function ArticleView({ route, navigation }: Props) {
 	return (
 		<Container>
 			<View style={containerStyles.contentContainer}>
@@ -25,10 +24,10 @@ function EntriesView({ route, navigation }: Props) {
 						/>,
 					]}
 				/>
-				<EntriesList filter={route.params.filter} />
+				<ArticleContent content={route.params.content} />
 			</View>
 		</Container>
 	);
 }
 
-export default EntriesView;
+export default ArticleView;
