@@ -5,7 +5,6 @@ export const listStyles = StyleSheet.create({
 		flex: 1,
 		flexDirection: "column",
 		justifyContent: "flex-start",
-		borderTopWidth: 2,
 	},
 	listItem: {
 		paddingRight: 10,

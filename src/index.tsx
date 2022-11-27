@@ -1,27 +1,47 @@
-import { View } from "react-native";
 import { useAppDispatch, useAppSelector } from "./hooks";
-import { initialize } from "./store/minifluxSlice";
+import {
+	initialize,
+	tryFetchFeeds,
+	tryGetAllEntries,
+} from "./store/minifluxSlice";
 
-import { NavigationContainer } from "@react-navigation/native";
-
-import { PropsWithChildren, useEffect } from "react";
+import { useEffect } from "react";
 
 import LoginView from "./views/login/loginView";
 import LoadingView from "./views/loading/loadingView";
-import { containerStyles } from "./styles/containerStyles";
 import Navigator from "./views/navigator";
 
-import Navbar from "./views/navbar/navbar";
 import { Container } from "./components/containter";
+
+import { FetchingProgress } from "./store/minifluxSlice";
 
 function Root() {
 	const initialized = useAppSelector((state) => state.miniflux.initialized);
 	const loggedIn = useAppSelector((state) => state.miniflux.loggedIn);
 
+	const fetchingProgress = useAppSelector(
+		(state) => state.miniflux.fetchingProgress,
+	);
+
 	const dispatch = useAppDispatch();
 	useEffect(() => {
 		dispatch(initialize());
 	}, []);
+
+	useEffect(() => {
+		if (fetchingProgress === FetchingProgress.Finished) {
+			return;
+		}
+		if (fetchingProgress === FetchingProgress.NotStarted) {
+			return;
+		}
+		if (fetchingProgress === FetchingProgress.FetchingFeeds) {
+			dispatch(tryFetchFeeds());
+		}
+		if (fetchingProgress === FetchingProgress.FetchingEntries) {
+			dispatch(tryGetAllEntries());
+		}
+	}, [fetchingProgress]);
 
 	if (!initialized) {
 		return (

@@ -13,10 +13,18 @@ type MinifluxState = {
 
 	loggedIn: boolean;
 	initialized: boolean;
+	fetchingProgress: FetchingProgress;
 	error: MinifluxError | null;
 
 	feeds: Record<string, Feed>;
+	entries: Entry[];
 };
+export enum FetchingProgress {
+	NotStarted,
+	FetchingFeeds,
+	FetchingEntries,
+	Finished,
+}
 type MinifluxError = {
 	message: string;
 	type: string;
@@ -42,9 +50,11 @@ const initialState: MinifluxState = {
 
 	loggedIn: false,
 	initialized: false,
+	fetchingProgress: FetchingProgress.NotStarted,
 	error: null,
 
 	feeds: {},
+	entries: [],
 };
 
 export const minifluxSlice = createSlice({
@@ -63,6 +73,12 @@ export const minifluxSlice = createSlice({
 		setInitialized: (state, action: PayloadAction<boolean>) => {
 			state.initialized = action.payload;
 		},
+		setFetchingProgress: (
+			state,
+			action: PayloadAction<FetchingProgress>,
+		) => {
+			state.fetchingProgress = action.payload;
+		},
 		login: (state, action) => {
 			state.loggedIn = true;
 			state.username = action.payload.username;
@@ -78,15 +94,31 @@ export const minifluxSlice = createSlice({
 		) => {
 			state.feeds[action.payload.id].icon_data = action.payload.icon;
 		},
+		addEntries: (state, action: PayloadAction<Entry[]>) => {
+			state.entries = [...state.entries, ...action.payload];
+		},
+		clearEntries: (state) => {
+			state.entries = [];
+		},
+		clearFeedEntries: (state, action: PayloadAction<string>) => {
+			state.entries = state.entries.filter(
+				(entry) => entry.feed_id !== action.payload,
+			);
+		},
 	},
 });
+
 export const {
 	setError,
 	clearError,
 	setInitialized,
+	setFetchingProgress,
 	login,
 	setFeeds,
 	setFeedIcon,
+	addEntries,
+	clearEntries,
+	clearFeedEntries,
 } = minifluxSlice.actions;
 
 export const initialize = () => {
@@ -121,6 +153,7 @@ export const tryLogin = (instanceUrl: string, apiKey: string) => {
 						apiKey: apiKey,
 					}),
 				);
+				dispatch(setFetchingProgress(FetchingProgress.FetchingFeeds));
 			} else {
 				dispatch(
 					setError({
@@ -178,6 +211,7 @@ export const tryFetchFeeds = () => {
 				}
 
 				dispatch(setFeeds(feeds));
+				dispatch(setFetchingProgress(FetchingProgress.FetchingEntries));
 			} else {
 				dispatch(
 					setError({
@@ -228,6 +262,75 @@ export const tryGetFeedIcon = (feedId: string) => {
 		}
 	};
 };
+export const tryGetFeedEntries = (feedId: string) => {
+	return async (dispatch: AppDispatch, getState: () => RootState) => {
+		dispatch(clearFeedEntries(feedId));
+		try {
+			const state = getState();
+
+			const requestParams = new URLSearchParams({
+				limit: "5",
+				order: "published_at",
+				direction: "desc",
+			});
+
+			const response = await fetch(
+				state.miniflux.apiUrl +
+					"/feeds/" +
+					feedId +
+					"/entries" +
+					"?" +
+					requestParams.toString(),
+				{
+					method: "GET",
+					headers: {
+						"X-Auth-Token": state.miniflux.apiKey,
+					},
+				},
+			);
+			if (response.status === 200) {
+				const body = await response.json();
+
+				const entries: Entry[] = [];
+				for (const entry of body.entries) {
+					entries.push({
+						id: entry.id,
+						feed_id: entry.feed_id,
+						title: entry.title,
+						author: entry.author,
+						url: entry.url,
+						content: entry.content,
+						published_at: entry.published_at,
+						created_at: entry.created_at,
+						status: entry.status,
+						starred: entry.starred,
+					});
+				}
+
+				dispatch(addEntries(entries));
+			}
+		} catch (e) {
+			dispatch(
+				setError({
+					message: "Network error fetching entries",
+					type: "network",
+				}),
+			);
+		}
+	};
+};
+export const tryGetAllEntries = () => {
+	return async (dispatch: AppDispatch, getState: () => RootState) => {
+		const state = getState();
+		if (Object.values(state.miniflux.feeds).length > 0) {
+			dispatch(clearEntries());
+			Object.values(state.miniflux.feeds).forEach((feed) => {
+				dispatch(tryGetFeedEntries(feed.id));
+			});
+		}
+		dispatch(setFetchingProgress(FetchingProgress.Finished));
+	};
+};
 
 export type Feed = {
 	id: string;
@@ -244,8 +347,8 @@ export type Feed = {
 	icon_data: string;
 };
 export type Entry = {
-	id: number;
-	feed_id: number;
+	id: string;
+	feed_id: string;
 
 	title: string;
 	author: string;
@@ -255,7 +358,7 @@ export type Entry = {
 	published_at: string;
 	created_at: string;
 
-	status: string;
+	status: "read" | "unread" | "removed";
 	starred: boolean;
 };
 
