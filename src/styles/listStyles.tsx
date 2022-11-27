@@ -22,12 +22,17 @@ export const listStyles = StyleSheet.create({
 		flexDirection: "column",
 		justifyContent: "center",
 	},
-	listItemIcon: {
+	listItemIconContainer: {
 		marginLeft: 10,
 		flex: 0,
 		height: "80%",
 		aspectRatio: 1,
-		backgroundColor: "#aaa",
+		backgroundColor: "#fff",
+	},
+	listItemIcon: {
+		flex: 1,
+		width: "100%",
+		height: "100%",
 	},
 	listItemTitle: {},
 	listItemSubtitle: {

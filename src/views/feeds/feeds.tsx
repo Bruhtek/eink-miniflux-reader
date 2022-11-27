@@ -5,14 +5,14 @@ import Navbar from "../navbar/navbar";
 import { Container } from "../../components/containter";
 import { useAppDispatch } from "../../hooks";
 import { useEffect } from "react";
-import { tryFetchFeeds } from "../../store/minifluxSlice";
+import { getFeeds } from "../../store/minifluxSlice";
 
 import FeedList from "./feedList";
 
 function Feeds() {
 	const dispatch = useAppDispatch();
 	useEffect(() => {
-		dispatch(tryFetchFeeds());
+		dispatch(getFeeds());
 	}, []);
 
 	return (

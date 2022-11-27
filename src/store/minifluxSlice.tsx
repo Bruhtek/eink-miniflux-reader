@@ -15,7 +15,7 @@ type MinifluxState = {
 	initialized: boolean;
 	error: MinifluxError | null;
 
-	feeds: Feed[];
+	feeds: Record<string, Feed>;
 };
 type MinifluxError = {
 	message: string;
@@ -44,7 +44,7 @@ const initialState: MinifluxState = {
 	initialized: false,
 	error: null,
 
-	feeds: [],
+	feeds: {},
 };
 
 export const minifluxSlice = createSlice({
@@ -69,24 +69,38 @@ export const minifluxSlice = createSlice({
 			state.apiUrl = action.payload.apiUrl;
 			state.apiKey = action.payload.apiKey;
 		},
-		setFeeds: (state, action: PayloadAction<Feed[]>) => {
+		setFeeds: (state, action: PayloadAction<Record<string, Feed>>) => {
 			state.feeds = action.payload;
+		},
+		setFeedIcon: (
+			state,
+			action: PayloadAction<{ id: string; icon: string }>,
+		) => {
+			state.feeds[action.payload.id].icon_data = action.payload.icon;
 		},
 	},
 });
-export const { setError, clearError, setInitialized, login, setFeeds } =
-	minifluxSlice.actions;
+export const {
+	setError,
+	clearError,
+	setInitialized,
+	login,
+	setFeeds,
+	setFeedIcon,
+} = minifluxSlice.actions;
 
-export const initialize = () => async (dispatch: AppDispatch) => {
-	const [url, apiKey] = await getLoginCredentials();
-	if (url && apiKey) {
-		dispatch(tryLogin(url, apiKey));
-		return;
-	}
-	dispatch(setInitialized(true));
+export const initialize = () => {
+	return async (dispatch: AppDispatch) => {
+		const [url, apiKey] = await getLoginCredentials();
+		if (url && apiKey) {
+			dispatch(tryLogin(url, apiKey));
+			return;
+		}
+		dispatch(setInitialized(true));
+	};
 };
-export const tryLogin =
-	(instanceUrl: string, apiKey: string) => async (dispatch: Dispatch) => {
+export const tryLogin = (instanceUrl: string, apiKey: string) => {
+	return async (dispatch: Dispatch) => {
 		dispatch(clearError());
 		try {
 			const response = await fetch(instanceUrl + apiPath + "/me", {
@@ -126,9 +140,17 @@ export const tryLogin =
 			dispatch(setInitialized(true));
 		}
 	};
-
-export const tryFetchFeeds =
-	() => async (dispatch: AppDispatch, getState: () => RootState) => {
+};
+export const getFeeds = () => {
+	return async (dispatch: AppDispatch, getState: () => RootState) => {
+		const state = getState();
+		if (Object.values(state.miniflux.feeds).length === 0) {
+			dispatch(tryFetchFeeds());
+		}
+	};
+};
+export const tryFetchFeeds = () => {
+	return async (dispatch: AppDispatch, getState: () => RootState) => {
 		try {
 			const state = getState();
 			const response = await fetch(state.miniflux.apiUrl + "/feeds", {
@@ -140,9 +162,9 @@ export const tryFetchFeeds =
 			if (response.status === 200) {
 				const body = await response.json();
 
-				const feeds: Feed[] = [];
+				const feeds: Record<string, Feed> = {};
 				for (const feed of body) {
-					feeds.push({
+					feeds[feed.id] = {
 						id: feed.id,
 						user_id: feed.user_id,
 						title: feed.title,
@@ -151,7 +173,8 @@ export const tryFetchFeeds =
 						checked_at: feed.checked_at,
 						last_modified: feed.last_modified_header,
 						icon_id: feed.icon_id,
-					});
+						icon_data: "data:null",
+					};
 				}
 
 				dispatch(setFeeds(feeds));
@@ -172,10 +195,43 @@ export const tryFetchFeeds =
 			);
 		}
 	};
+};
+export const tryGetFeedIcon = (feedId: string) => {
+	return async (dispatch: AppDispatch, getState: () => RootState) => {
+		try {
+			const state = getState();
+			const response = await fetch(
+				state.miniflux.apiUrl + "/feeds/" + feedId + "/icon",
+				{
+					method: "GET",
+					headers: {
+						"X-Auth-Token": state.miniflux.apiKey,
+					},
+				},
+			);
+
+			if (response.status === 200) {
+				const data = await response.json();
+				dispatch(
+					setFeedIcon({ id: feedId, icon: "data:" + data.data }),
+				);
+			} else {
+				dispatch(setFeedIcon({ id: feedId, icon: "data:null" }));
+			}
+		} catch (e) {
+			dispatch(
+				setError({
+					message: "Network error fetching icon",
+					type: "network",
+				}),
+			);
+		}
+	};
+};
 
 export type Feed = {
-	id: number;
-	user_id: number;
+	id: string;
+	user_id: string;
 
 	title: string;
 	site_url: string;
@@ -185,7 +241,7 @@ export type Feed = {
 	last_modified: string;
 
 	icon_id: number;
-	icon_data?: string;
+	icon_data: string;
 };
 export type Entry = {
 	id: number;

@@ -8,10 +8,11 @@ function FeedList() {
 
 	return (
 		<View style={listStyles.listContainer}>
-			{feeds.map((feed, index) => (
+			{Object.values(feeds).map((feed, index) => (
 				<FeedItem
 					title={feed.title}
 					subtitle={feed.site_url}
+					feedId={feed.id}
 					key={index}
 				/>
 			))}
